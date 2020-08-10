@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>Time Guessing Challenge</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<style>
+* {
+				margin: 0;
+				-moz-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select:none;
+				user-select:none;-o-user-select:none;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				
+}
+
+html {
+				text-align: center;
+				background-color: #00b187;
+				font-family: "Arial";
+				font-weight: 300;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				color: #5a5a5a;}
+
+h1 {
+				color: #3e88aa;
+				font-weight: 300;
+				margin-top: 20px;
+}
+
+.container {
+				position: absolute;
+				top: 12px;
+				bottom: 12px;
+				left: 12px;
+				right: 12px;
+				padding: 20px;
+				background-color: #eefffb; border-radius: 40px;
+
+}
+
+#counter {color: black;}
+
+a {
+				text-decoration: none;
+				color: black;
+}
+
+
+a.homepage {
+				border: 1px solid black;
+				border-radius: 30px;
+			 padding: 20px 10px;
+}
+
+.retry {
+				padding: 10px 20px;
+				border: none;
+				background-color: #00b187;
+				width: 200px;
+				margin: 0 auto;
+				display:none;
+				border-radius: 20px;
+}
+
+.counter-container {
+				font-size: 40px;
+				height: 40px;
+}
+
+</style>
+<script src="basic.js"></script>
+<script src="jquery.js"></script>
+<script>
+
+
+function getHighScore() {
+   if(isCookie("timeGuesser"))
+     {document.getElementById("high-score").innerHTML = getCookie("timeGuesser");}
+   else
+     {setCookie("timeGuesser",0,90);}
+}
+$(window).on("touchstart", function(e) {
+    if(!$("#counter").hasClass("gameOver"))
+    {
+    clearTimeout(this.downTimer);
+    var counter = parseFloat($("#counter").html());
+    $("#lastnum").html(counter);
+    var attemptNumber = parseInt($("#attempt-number").html())+1;
+    $("#attempt-number").html(attemptNumber);
+    $("#counter").html(0);
+    $("#counter").fadeOut(4000);
+    $("#victory").html("Time Guesser");
+    $("#message").html("Try to hold down for exactly 5 seconds.");
+    this.downTimer = setInterval(function() {
+           var counter = parseFloat($("#counter").html());
+           counter = counter*1000;
+           $("#counter").html(parseFloat((counter+10)/1000).toFixed(2));
+    }, 10);
+    }
+}).bind("mouseup touchend", function(e) {
+    if(!$("#counter").hasClass("gameOver"))
+    {
+    clearInterval(this.downTimer);
+    var attemptNumber = parseInt($("#attempt-number").html());
+    $("#counter").stop().fadeOut(10).fadeIn(10);
+    if($("#counter").html() == "5.00")
+        {
+        $("#counter").addClass("gameOver");
+        $("#victory").html("Victory!");
+        $("#victory").css("color","#00cb03");
+        $("#message").html("You won in "+attemptNumber+" attempt(s).");
+        $("#attempt-number").html("0");
+        $("#lastnum").html("0");
+        $(".retry").show();
+        $("#lastnum").parent().hide();
+        $("#attempt-number").parent().hide();
+    var highscore = getCookie("timeGuesser");
+    if(attemptNumber < highscore || highscore == 0)
+    {setCookie("timeGuesser",attemptNumber,90);
+    $("#high-score").html(attemptNumber);}
+    }
+    //attemptNumber++;
+    var counter = parseFloat($("#counter").html());
+    var currentError = $("#average-error").html();
+    var averageError = parseFloat((currentError * attemptNumber + (-1 * parseFloat((5 - counter) / 5 * 100).toFixed(2))) / attemptNumber).toFixed(2);
+    $("#average-error").html(averageError);
+    $("#attempt-number").html(attemptNumber);
+    }
+});
+
+</script>
+</head>
+<body onload="getHighScore()">
+<div class="container-container">
+<div class="container">
+<h1 id="victory">Time Guesser</h1>
+<div id="message">Try to hold down for exactly 5 seconds.</div><br/><br/>
+<div class="counter-container"><span id="counter">0</span></div><br/><br/>
+<div>Last Attempt: <span id="lastnum">0</span></div>
+<div style="display:none;">Average Error: <span id="average-error">0</span>%</div>
+<div>Total Attempts: <span id="attempt-number">0</span></div><br/><br/>
+<a href=""><div class="retry">Retry</div><a/>
+<br/><br/><div id="high-score-container" class="high-score-container">High Score: <br/><span id="high-score">0</span> attempt(s)</div>
+
+<h4 style="text-align;center;font-weight:300; padding:75px;">©thisismywebsitenow.com</h4>
+
+
+</div>
+</div>
+</body>
+</html>
